@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>what is THIS in a namespace</title>
+    <script type="text/javascript">
+        CL = {
+            Namespace: {
+                functions: {
+                    onload: function () {
+                        var mybadhome = this; // this is the holding element - namely CL.Namespace.functions !! --> see http://www.quirksmode.org/js/this.html
+                        var myhome = CL.Namespace.functions; // expressing, what u want...
+                        var squares = [
+                            new this.square(15) // watchout!! this == CL.Namespace.functions --> bad pattern
+                            , new CL.Namespace.functions.square(12) // --> better pattern, because u know, where u are...
+                            , new myhome.square(11) // --> more readable, because the reference to the namespace is only defined once..
+                        ];
+                        this.square(25); // just a plain functioncall... this call pollutes the CL.Namespace.functions namespace with el = 25 and getEdgelength = function() {...} !!
+                        var html = "";
+                        for (var i = 0; i < squares.length; i++) {
+                            var thissquare = squares[i];
+                            html += "Square" + i + " with edge length " + thissquare.getEdgelength() + " has an area of " + thissquare.getArea() + "<br/>";
+                        }
+                        html += "<br/> 'this' contains the following elements:<br/>";
+                        for (var element in myhome) {
+                            var thevalue = myhome[element];
+                            html += element + " of type " + typeof (thevalue) + ((typeof (thevalue) == "function") ? "" : " with value : " + thevalue) + "<br/>";
+                        }
+                        document.getElementById("result").innerHTML = html;
+                    }
+                    , square: function (edgelength) {
+                        this.el = edgelength; // this is the instance of CL.Namespace.functions.square when instantiated with new operator, else the calling namespace...!!
+                        this.getEdgelength = function () { return this.el; }; // not good when unneccesary, functions within functions
+                    }
+                }
+            }
+        }
+        CL.Namespace.functions.square.prototype.getArea = function () { // better approach than functiondefinition within 'class'definition..
+            return Math.pow(this.el, 2); // watch out!! this == instance of CL.Namespace.functions.square
+        };
+    </script>
+</head>
+<body onload="CL.Namespace.functions.onload()">
+    <div id="result">empty</div>
+</body>
+</html>
