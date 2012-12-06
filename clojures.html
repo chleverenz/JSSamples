@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>capturing the context in Javascript - aka clojures</title>
+    <script type="text/javascript">
+        CL = {
+            Namespace: {
+                functions: {
+                    onload: function () {
+                        document.getElementById("result").innerHTML = html;
+                    }
+                    , square: function (edgelength) {
+                        this.el = edgelength; 
+                    }
+                }
+            }
+        }
+        CL.Namespace.functions.square.prototype.getArea = function () { 
+            return Math.pow(this.el, 2);
+        };
+        CL.Namespace.functions.square.prototype.getSlant = function () { 
+            return Math.sqrt(this.el * 2.0);
+        };
+        CL.Namespace.functions.square.prototype.getEdgelength = function () {
+            return this.el;
+        };
+    </script>
+</head>
+<body onload="CL.Namespace.functions.onload()">
+    <div id="result">empty</div>
+</body>
+</html>
