@@ -1,0 +1,49 @@
+<!--
+sampleCode provided by Christian Leverenz
+christian@leverenz.de
+
+This code comes with no warranty to fit any specific purpose. It is just for demo.
+Feel Free to use or modify this code.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>simple Templating</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="//code.jquery.com/qunit/qunit-1.15.0.css">
+        <script src="//code.jquery.com/qunit/qunit-1.15.0.js"></script>
+        <script src="pedestriansTemplate.js"></script>
+        <script type="text/javascript">
+            biz = {leverenz: {functions: {}, data: {}, consts: {}}};
+            biz.leverenz.data.samples = [
+                {format: "i have #{bananacount} bananas and they seem to be #{bananacondition}", data: {bananacount: 3, bananacondition: "yellow"}, expect: "i have 3 bananas and they seem to be yellow"}
+                , {format: "the answer is as ususal #{answer:42}", data: null, expect: "the answer is as ususal 42"}
+                , {format: "but if given, it may be #{answer:42} (which is half of the truth)", data: {answer: 21}, expect: "but if given, it may be 21 (which is half of the truth)"}
+                , {format: "if no value is passed and there is no default, the placeholder is kept #{answer}", data: {wronganswer: 21}, expect: "if no value is passed and there is no default, the placeholder is kept #{answer}"}
+                , {format: "deep nesting #{mydata.answer}", data: {mydata: {answer: 21}}, expect: "deep nesting 21"}
+                , {format: "deep nesting with default #{mydata.answer:42}", data: {mydata: {answer: 21}}, expect: "deep nesting with default 21"}
+                , {format: "deep nesting with default and no data #{mydata.answer:42}", data: {mydata: {xanswer: 21}}, expect: "deep nesting with default and no data 42"}
+                , {format: "functioncall as data #{mydata.answer}", data: {mydata: {answer: function(actualdata, name, defaultvalue) {return "ruebennase"}}}, expect: "functioncall as data ruebennase"}
+                , {format: "functioncall as data with default #{mydata.answer:cucumberjack}", data: {mydata: {answer: function(actualdata, name, defaultvalue) {return defaultvalue}}}, expect: "functioncall as data with default cucumberjack"}
+                , {format: "functioncall as data with default no data #{mydata.answer:cucumberjack}", data: {mydata: {xanswer: function(actualdata, name, defaultvalue) {return defaultvalue}}}, expect: "functioncall as data with default no data cucumberjack"}
+                , {format: "deep nesting with functioncall #{mydata.answer}", data: {mydata: {answer: function(actualdata, name, defaultvalue) {return name}}}, expect: "deep nesting with functioncall mydata.answer"}
+            ];
+
+            biz.leverenz.functions.startUp = function () {
+                var testfunction = (function (testcases) {
+                    return function (assert) {
+                        for (var i = 0; i < testcases.length; i++) {
+                            var thistestcase = testcases[i];
+                            var result = pedestriansTemplate.evalTemplate(thistestcase.format, thistestcase.data);
+                            assert.ok(result === thistestcase.expect, "format '" + thistestcase.format + "' is to be evaluated to '" + thistestcase.expect + "' and was evaluated to '" + result + "'");
+                        }
+                    };
+                })(biz.leverenz.data.samples);
+                QUnit.test("simple Stringtemplating", testfunction);
+            };
+        </script>
+    </head>
+    <body onload="biz.leverenz.functions.startUp()">
+        <div id="qunit"></div>
+        <div id="qunit-fixture"></div>
+    </body>
